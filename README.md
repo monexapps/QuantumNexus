@@ -471,7 +471,8 @@ Let’s start by deploying the <code>Dex.sol</code> contract:
 
 <code>yarn hardhat deploy --tags dex --network sepolia</code>
 
-![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/84aa5903-f4ae-4b59-97ae-9bcef34072af)
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/36acecfd-e769-47dc-81ec-bfbe05ddbca3)
+
 
 The Dex contract address is <code>“0x81EA031a86EaD3AfbD1F50CF18b0B16394b1c076”</code> which is added to the <code>FlashLoanArbitrage</code> contract
 
@@ -479,7 +480,7 @@ Then we deploy <code>FlashLoanArbitrage.sol</code> by running the command below:
 
 <code>yarn hardhat deploy --tags FlashLoanArbitrage --network sepolia</code>
 
-![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/1523c03f-ee4d-4fc9-a008-fd499b965050)
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/e5692b22-1ce0-4cc0-88dc-08375bd9b1a5)
 
 which outputs the FlashLoanArbitrage contract address below:
 <code>“0xc30b671E6d94C62Ee37669b229c7Cd9Eab2f7098”</code>
