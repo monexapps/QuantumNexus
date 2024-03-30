@@ -483,7 +483,7 @@ Then we deploy <code>FlashLoanArbitrage.sol</code> by running the command below:
 ![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/e5692b22-1ce0-4cc0-88dc-08375bd9b1a5)
 
 which outputs the FlashLoanArbitrage contract address below:
-<code>“0xc30b671E6d94C62Ee37669b229c7Cd9Eab2f7098”</code>
+<code>“0xF05f88dAC4ADa7E11603ee06386086F05121C9F3”</code>
 
 #### Step 7: Testing Smart Contracts
 Let’s now text out the contracts using Remix IDE, but to be more specific here’s where the Flash Loan Arbitrage:
