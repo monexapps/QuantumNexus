@@ -23,6 +23,8 @@ With this code we want to achieve transcation Atomicity with Zero colateral loan
 - Infura - https://www.infura.io
 - Alchemy - https://alchemy.com
 - MetaMask - https://metamask.io
+- Solidity Programming Skills - https://soliditylang.org
+- OpenZeppelin - https://www.openzeppelin.com
 
 ### Project Execution Procedure
 #### Step 1 - Update OS
@@ -175,3 +177,237 @@ After all the adjustments made above, here’s how our project structure should 
 - package.json
 - README.md
 ```
+#### Step 5: Contracts
+
+In this tutorial, we’ll be working with two smart contracts:
+
+1. <code>Dex.sol:</code> - This contract simulates a decentralized exchange where arbitrage opportunities occur.
+2. <code>FlashLoanArbitrage.sol:</code> - This contract handles flash loans and arbitrage operations.
+
+Let’s dive into these contracts and understand each line of code. First, we’ll explore FlashLoanArbitrage.sol.
+
+<code>Dex.sol</code>
+
+```
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.10;
+
+import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
+
+contract Dex {
+    address payable public owner;
+
+    IERC20 private dai;
+    IERC20 private usdc;
+
+    // exchange rate indexes
+    uint256 dexARate = 90;
+    uint256 dexBRate = 100;
+
+    // keeps track of individuals' dai balances
+    mapping(address => uint256) public daiBalances;
+
+    // keeps track of individuals' USDC balances
+    mapping(address => uint256) public usdcBalances;
+
+    constructor(address  _daiAddress, address _usdcAddress) {
+        owner = payable(msg.sender);
+        dai = IERC20(_daiAddress);
+        usdc = IERC20(_usdcAddress);
+    }
+
+    function depositUSDC(uint256 _amount) external {
+        usdcBalances[msg.sender] += _amount;
+        uint256 allowance = usdc.allowance(msg.sender, address(this));
+        require(allowance >= _amount, "Check the token allowance");
+        usdc.transferFrom(msg.sender, address(this), _amount);
+    }
+
+    function depositDAI(uint256 _amount) external {
+        daiBalances[msg.sender] += _amount;
+        uint256 allowance = dai.allowance(msg.sender, address(this));
+        require(allowance >= _amount, "Check the token allowance");
+        dai.transferFrom(msg.sender, address(this), _amount);
+    }
+
+    function buyDAI() external {
+        uint256 daiToReceive = ((usdcBalances[msg.sender] / dexARate) * 100) *
+            (10**12);
+        dai.transfer(msg.sender, daiToReceive);
+    }
+
+    function sellDAI() external {
+        uint256 usdcToReceive = ((daiBalances[msg.sender] * dexBRate) / 100) /
+            (10**12);
+        usdc.transfer(msg.sender, usdcToReceive);
+    }
+
+    function getBalance(address _tokenAddress) external view returns (uint256) {
+        return IERC20(_tokenAddress).balanceOf(address(this));
+    }
+
+    function withdraw(address _tokenAddress) external onlyOwner {
+        IERC20 token = IERC20(_tokenAddress);
+        token.transfer(msg.sender, token.balanceOf(address(this)));
+    }
+
+    modifier onlyOwner() {
+        require(
+            msg.sender == owner,
+            "Only the contract owner can call this function"
+        );
+        _;
+    }
+
+    receive() external payable {}
+}
+```
+Read the Dex Contract Explanation:
+
+The <code>Dex.sol</code> contract simulates a decentralized exchanges. Let's dive into its key features:
+
+- Dex Contract: The main contract defines storage variables for the owner, DAI and USDC addresses, and instances of IERC20 for DAI and USDC.
+- Token Deposits: depositUSDC and depositDAI functions allow users to deposit USDC and DAI tokens, updating their balances.
+- Token Exchange: buyDAI and sellDAI functions simulate token exchanges, buying DAI with USDC and selling DAI for USDC based on exchange rates.
+- Balance Tracking: The contract tracks individual user balances for DAI and USDC with mappings.
+- Token Withdrawal: The withdraw function enables the contract owner to withdraw tokens from the contract.
+
+<code>FlashLoanArbitrage.sol</code>
+
+```
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.10;
+
+import {FlashLoanSimpleReceiverBase} from "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
+import {IPoolAddressesProvider} from "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
+import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
+
+interface IDex {
+    function depositUSDC(uint256 _amount) external;
+
+    function depositDAI(uint256 _amount) external;
+
+    function buyDAI() external;
+
+    function sellDAI() external;
+}
+
+contract FlashLoanArbitrage is FlashLoanSimpleReceiverBase {
+    address payable owner;
+    // Dex contract address
+    address private dexContractAddress =
+        0x81EA031a86EaD3AfbD1F50CF18b0B16394b1c076;
+
+    IERC20 private dai;
+    IERC20 private usdc;
+    IDex private dexContract;
+
+    constructor(address _addressProvider,address  _daiAddress, address _usdcAddress)
+        FlashLoanSimpleReceiverBase(IPoolAddressesProvider(_addressProvider))
+    {
+        owner = payable(msg.sender);
+
+        dai = IERC20(_daiAddress);
+        usdc = IERC20(_usdcAddress);
+        dexContract = IDex(dexContractAddress);
+    }
+
+    /**
+        This function is called after your contract has received the flash loaned amount
+     */
+    function executeOperation(
+        address asset,
+        uint256 amount,
+        uint256 premium,
+        address initiator,
+        bytes calldata params
+    ) external override returns (bool) {
+        //
+        // This contract now has the funds requested.
+        // Your logic goes here.
+        //
+
+        // Arbirtage operation
+        dexContract.depositUSDC(1000000000); // 1000 USDC
+        dexContract.buyDAI();
+        dexContract.depositDAI(dai.balanceOf(address(this)));
+        dexContract.sellDAI();
+
+        // At the end of your logic above, this contract owes
+        // the flashloaned amount + premiums.
+        // Therefore ensure your contract has enough to repay
+        // these amounts.
+
+        // Approve the Pool contract allowance to *pull* the owed amount
+        uint256 amountOwed = amount + premium;
+        IERC20(asset).approve(address(POOL), amountOwed);
+
+        return true;
+    }
+
+    function requestFlashLoan(address _token, uint256 _amount) public {
+        address receiverAddress = address(this);
+        address asset = _token;
+        uint256 amount = _amount;
+        bytes memory params = "";
+        uint16 referralCode = 0;
+
+        POOL.flashLoanSimple(
+            receiverAddress,
+            asset,
+            amount,
+            params,
+            referralCode
+        );
+    }
+
+    function approveUSDC(uint256 _amount) external returns (bool) {
+        return usdc.approve(dexContractAddress, _amount);
+    }
+
+    function allowanceUSDC() external view returns (uint256) {
+        return usdc.allowance(address(this), dexContractAddress);
+    }
+
+    function approveDAI(uint256 _amount) external returns (bool) {
+        return dai.approve(dexContractAddress, _amount);
+    }
+
+    function allowanceDAI() external view returns (uint256) {
+        return dai.allowance(address(this), dexContractAddress);
+    }
+
+    function getBalance(address _tokenAddress) external view returns (uint256) {
+        return IERC20(_tokenAddress).balanceOf(address(this));
+    }
+
+    function withdraw(address _tokenAddress) external onlyOwner {
+        IERC20 token = IERC20(_tokenAddress);
+        token.transfer(msg.sender, token.balanceOf(address(this)));
+    }
+
+    modifier onlyOwner() {
+        require(
+            msg.sender == owner,
+            "Only the contract owner can call this function"
+        );
+        _;
+    }
+
+    receive() external payable {}
+}
+```
+Read the <code>FlashLoanArbitrage.sol</code> Contract Explanation:
+
+The <code>FlashLoanArbitrage.sol</code> contract is the core of our arbitrage strategy. 
+
+It utilizes Aave flash loans to execute profitable trades. Let's break down the key aspects of the contract:
+
+- Imports and Interfaces: Import the required contracts and interfaces from Aave and OpenZeppelin. These include <code>FlashLoanSimpleReceiverBase</code>, <code>IPoolAddressesProvider</code>, and <code>IERC20</code>.
+- IDex Interface: Define the interface for the decentralized exchange (DEX) where arbitrage takes place. Methods like <code>depositUSDC</code>, <code>depositDAI</code>, <code>buyDAI</code>, and <code>sellDAI</code> are defined.
+- FlashLoanArbitrage Contract: The main contract, inheriting from, initializes addresses and contracts for DAI, USDC, and the DEX. It implements the <code>executeOperation</code> function that executes the arbitrage operation, buying DAI at a lower rate and selling it at a higher rate.
+- Flash Loan Execution: The arbitrage operation is executed within the <code>executeOperation</code> function. Funds are deposited, DAI is bought, deposited, and then sold.
+- Loan Repayment: The contract repays the flash loan amount plus the premium to Aave by approving the Pool contract to pull the owed amount.
+- Flash Loan Request: The <code>requestFlashLoan</code> function initiates the flash loan by calling <code>flashLoanSimple</code> from the POOL contract.
+- Token Approval and Allowance: Functions like <code>approveUSDC<code>, <code>approveDAI<code>, <code>allowanceUSDC<code>, and allowanceDAI are included for approving tokens and checking allowances for the DEX.
+- Balance Inquiry and Withdrawal: The <code>getBalance<code> function checks the balance of a token. The <code>withdraw<code> function allows the contract owner to withdraw tokens.
