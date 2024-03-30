@@ -409,5 +409,5 @@ It utilizes Aave flash loans to execute profitable trades. Let's break down the 
 - Flash Loan Execution: The arbitrage operation is executed within the <code>executeOperation</code> function. Funds are deposited, DAI is bought, deposited, and then sold.
 - Loan Repayment: The contract repays the flash loan amount plus the premium to Aave by approving the Pool contract to pull the owed amount.
 - Flash Loan Request: The <code>requestFlashLoan</code> function initiates the flash loan by calling <code>flashLoanSimple</code> from the POOL contract.
-- Token Approval and Allowance: Functions like <code>approveUSDC<code>, <code>approveDAI<code>, <code>allowanceUSDC<code>, and allowanceDAI are included for approving tokens and checking allowances for the DEX.
-- Balance Inquiry and Withdrawal: The <code>getBalance<code> function checks the balance of a token. The <code>withdraw<code> function allows the contract owner to withdraw tokens.
+- Token Approval and Allowance: Functions like <code>approveUSDC<code>, <code>approveDAI</code>, <code>allowanceUSDC</code>, and <code>allowanceDAI</code> are included for approving tokens and checking allowances for the DEX.
+- Balance Inquiry and Withdrawal: The <code>getBalance</code> function checks the balance of a token. The <code>withdraw</code> function allows the contract owner to withdraw tokens.
