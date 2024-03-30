@@ -49,7 +49,19 @@ We’ll need to install some additional dependencies for our project. Open your 
 #### Step 4: Project Structure
 Your project directory should now have the following structure:
 
-![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/ee3302af-2560-40ea-aade-7a8e94096a34)
+```
+- contracts/
+  - FlashLoanArbitrage.sol
+  - Dex.sol
+- deploy/
+  - 00-deployDex.js
+  - 01-deployFlashLoanArbitrage.js  
+- scripts/
+- test/
+- hardhat.config.js
+- package.json
+- README.md
+```
 
 create <code>.env</code> file, add both <code>SEPOLIA_RPC_URL</code> and <code>PRIVATE_KEY</code> by your proper credentials as follows:
 
@@ -119,3 +131,47 @@ Open <code>hardhat.config.js</code>, and update it with the details below:
             timeout: 500000, // 500 seconds max for running tests
         },
     }
+
+    
+
+Additionally, create a new file called <code>helper-hardhat-config.js</code> in the root directory and add the following needed details keeping in ming that we’re using the Sepolia test network for all save addresses:
+1. PoolAddressesProvider,
+2. daiAddress,
+3. usdcAddress
+
+Here’s how this file should look:
+
+```const { ethers } = require('hardhat');
+
+const networkConfig = {
+  default: {
+    name: 'hardhat',
+  },
+  11155111: {
+    name: 'sepolia',
+    PoolAddressesProvider: '0x0496275d34753A48320CA58103d5220d394FF77F',
+    daiAddress:'0x68194a729C2450ad26072b3D33ADaCbcef39D574',
+    usdcAddress:'0xda9d4f9b69ac6C22e444eD9aF0CfC043b7a7f53f',
+  },
+};
+
+module.exports = {
+  networkConfig
+} 
+```
+After all the adjustments made above, here’s how our project structure should look:
+```
+- contracts/
+  - FlashLoanArbitrage.sol
+  - Dex.sol
+- deploy/
+  - 00-deployDex.js
+  - 01-deployFlashLoanArbitrage.js  
+- scripts/
+- test/
+-.env
+- hardhat.config.js
+-helper-hardhat-config
+- package.json
+- README.md
+```
