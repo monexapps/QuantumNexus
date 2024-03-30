@@ -23,3 +23,31 @@ With this code we want to achieve transcation Atomicity with Zero colateral loan
 - Infura - https://www.infura.io
 - Alchemy - https://alchemy.com
 - MetaMask - https://metamask.io
+
+### Project Execution Procedure
+#### Step 1 - Update OS
+<code> $ apt update -y && apt upgrade -y </code>
+
+Reboot afterwards
+
+#### Step 2 - Initialize New HardHat Project
+Open your terminal and navigate to your desired project directory. Run the following commands:
+
+<code>npm install --save-dev hardhat</code>
+
+<code>npx hardhat</code>
+
+Follow the prompts to create a new Hardhat project. Choose the default settings for simplicity.
+
+#### Step 3 - Install Dependencies
+We’ll need to install some additional dependencies for our project. Open your terminal and run the following commands:
+
+<code>yarn add --dev @nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers ethers @nomiclabs/hardhat-etherscan @nomiclabs/hardhat-waffle chai ethereum-waffle hardhat hardhat-contract-sizer hardhat-deploy hardhat-gas-reporter prettier prettier-plugin-solidity solhint solidity-coverage dotenv</code>
+
+<code>yarn add @aave/core-v3</code>
+
+#### Step 4: Project Structure
+Your project directory should now have the following structure:
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/ee3302af-2560-40ea-aade-7a8e94096a34)
+
+create <code>.env</code> file, add both S<code>EPOLIA_RPC_URL</code> and <code>PRIVATE_KEY</code> by your proper credentials as follows:
