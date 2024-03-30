@@ -18,7 +18,7 @@ With this code we want to achieve transcation Atomicity with Zero colateral loan
 - Understanding of Blockchain and Smart Contracts: solid grasp of blockchain technology and how smart contracts work.
 - Ethereum and Hardhat Knowledge: Familiarity with Ethereum and the Hardhat development environment is essential.
 - If you’re new to Hardhat, consider going through their official documentation first here https://hardhat.org/getting-started
-- Node.js and NPM: Ensure you have Node.js and NPM (Node Package Manager) installed on your server.
+- Node.js,Yarn and NPM: Ensure you have Node.js and NPM (Node Package Manager) installed on your server.
 - Remix ETH IDE - Remix Online IDE is a powerful toolset for developing, deploying, debugging, and testing Ethereum and EVM-compatible smart contracts. - https://remix.ethereum.org
 - Infura - https://www.infura.io
 - Alchemy - https://alchemy.com
@@ -411,3 +411,146 @@ It utilizes Aave flash loans to execute profitable trades. Let's break down the 
 - Flash Loan Request: The <code>requestFlashLoan</code> function initiates the flash loan by calling <code>flashLoanSimple</code> from the POOL contract.
 - Token Approval and Allowance: Functions like <code>approveUSDC</code>, <code>approveDAI</code>, <code>allowanceUSDC</code>, and <code>allowanceDAI</code> are included for approving tokens and checking allowances for the DEX.
 - Balance Inquiry and Withdrawal: The <code>getBalance</code> function checks the balance of a token. The <code>withdraw</code> function allows the contract owner to withdraw tokens.
+
+#### Step 6: Deploying Smart Contracts
+Deploying your smart contracts is the next crucial step. Let’s take a look at the deployment scripts.
+
+<code>00-deployDex.js</code>
+
+The deployment script for the <code>Dex.sol</code> contract:
+
+```
+const { network } = require("hardhat")
+const { networkConfig } = require("../helper-hardhat-config")
+
+module.exports = async ({ getNamedAccounts, deployments }) => {
+  const { deploy, log } = deployments
+  const { deployer } = await getNamedAccounts()
+  const chainId = network.config.chainId
+  const arguments = [networkConfig[chainId]["daiAddress"],networkConfig[chainId]["usdcAddress"]]
+
+  const dex = await deploy("Dex", {
+    from: deployer,
+    args: arguments,
+    log: true,
+  })
+
+  log("Dex contract deployed at : ", dex.address)
+}
+
+module.exports.tags = ["all", "dex"]
+```
+
+<code>01-deployFlashLoanArbitrage.js</code>
+
+The deployment script for the <code>FlashLoanArbitrage.sol</code> contract:
+
+```
+const { network } = require("hardhat")
+const { networkConfig } = require("../helper-hardhat-config")
+
+module.exports = async ({ getNamedAccounts, deployments }) => {
+  const { deploy, log } = deployments
+  const { deployer } = await getNamedAccounts()
+  const chainId = network.config.chainId
+  const arguments = [networkConfig[chainId]["PoolAddressesProvider"],networkConfig[chainId]["daiAddress"],networkConfig[chainId]["usdcAddress"]]
+
+  const dex = await deploy("FlashLoanArbitrage", {
+    from: deployer,
+    args: arguments,
+    log: true,
+  })
+
+  log("FlashLoanArbitrage contract deployed at : ", dex.address)
+}
+
+module.exports.tags = ["all", "FlashLoanArbitrage"]
+```
+
+Let’s start by deploying the <code>Dex.sol</code> contract:
+
+<code>yarn hardhat deploy --tags dex --network sepolia</code>
+
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/56eadb23-e49d-4b53-906f-519d6e565260)
+
+The Dex contract address is <code>“0x81EA031a86EaD3AfbD1F50CF18b0B16394b1c076”</code> which is added to the <code>FlashLoanArbitrage</code> contract
+
+Then we deploy <code>FlashLoanArbitrage.sol</code> by running the command below:
+
+<code>yarn hardhat deploy --tags FlashLoanArbitrage --network sepolia</code>
+
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/1523c03f-ee4d-4fc9-a008-fd499b965050)
+
+which outputs the FlashLoanArbitrage contract address below:
+<code>“0xc30b671E6d94C62Ee37669b229c7Cd9Eab2f7098”</code>
+
+#### Step 7: Testing Smart Contracts
+Let’s now text out the contracts using Remix IDE, but to be more specific here’s where the Flash Loan Arbitrage:
+
+```
+// exchange rate indexes
+uint256 dexARate = 90;
+uint256 dexBRate = 100;
+```
+
+Here, we buy <code>1DAI</code> at 0.90 and sell it at 100.00 .
+When coping the code to Remix IDE, consider change the imports below in both contracts accordingly:
+
+```
+import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
+import {FlashLoanSimpleReceiverBase} from "https://github.com/aave/aave-v3-core/blob/master/contracts/flashloan/base/FlashLoanSimpleReceiver.sol";
+import {IPoolAddressesProvider} from "https://github.com/aave/aave-v3-core/blob/master/contracts/interfaces/IPoolAddressesProvider.sol";
+```
+
+Add liquidity to <code>Dex.sol</code>:
+- USDC 1500
+- DAI 1500
+
+  ![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/0e433102-26b6-4be3-ac61-382f034d9921)![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/e01bdc88-2be6-48a5-b68f-7cc04d8e1e0b)
+
+Approve:
+- USDC 1000000000
+- DAI 1200000000000000000000
+
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/d5cb2dc2-649f-4c12-ac1b-99516f19819b)
+
+Request Loan — USDC (6 decimal):
+
+1. 0xda9d4f9b69ac6C22e444eD9aF0CfC043b7a7f53f,1000000000 // 1,000 USDC
+
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/46c75898-c4d0-45cd-a853-dc58631f23fa)
+
+Let’s view our transaction on ehterscan
+
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/1ea4dd3f-cab2-45d4-88c1-0e312595525d)
+
+Here’s the transactions explanation:
+
+1 - Transfer 1000 USDC from the aave LendingPool contract toFlashLoanArbitrage contract,
+2 - Deposit 1000 USDC from the FlashLoanArbitrage contract to Dex contract,
+3 - Purchase of DAI From Dex contract to FlashLoanArbitrage contract,
+4 - Deposit of the DAI amount in the Dex contract,
+5 - Transfer 1,111.1111 USDC from Dex contract to FlashLoanArbitrage
+6 - Repay 1000 USDC + 0.05% of flashloan fee (1000.5 USDC)
+
+After a successfull tranaction, we’ll chek back our balalnce wich increases up to 110.611100 USDC
+
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/bd9cf566-b0e6-4d8b-aedd-fbad6031a0e6)
+
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/7b98b780-c13d-4c74-8959-b90d848818df)
+
+Then we Witdrawn and Import the token and we will have the 110.6 USDT made on our MetaMask Wallet as follows:
+
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/fc619271-ac7a-4727-ab14-706ac77b3908)
+
+
+
+
+
+
+
+
+
+
+
+
