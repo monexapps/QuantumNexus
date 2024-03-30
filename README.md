@@ -9,6 +9,11 @@ All of this in one simgle trasnsaction and without having 1,000.00 USDT nor need
 
 Welcome to the future of Lending and Borrowing....
 
+### Logical Functionality Diagram
+
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/4d7dd311-b840-4d30-9fed-d51b6c1b4599)
+
+
 ### Architecture Overview
 ![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/5a34357c-cc15-473a-8bfa-5fb9d2221a68)
 
