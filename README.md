@@ -20,3 +20,6 @@ With this code we want to achieve transcation Atomicity with Zero colateral loan
 - If you’re new to Hardhat, consider going through their official documentation first here https://hardhat.org/getting-started
 - Node.js and NPM: Ensure you have Node.js and NPM (Node Package Manager) installed on your server.
 - Remix ETH IDE - Remix Online IDE is a powerful toolset for developing, deploying, debugging, and testing Ethereum and EVM-compatible smart contracts. - https://remix.ethereum.org
+- Infura - https://www.infura.io
+- Alchemy - https://alchemy.com
+- MetaMask - https://metamask.io
