@@ -48,6 +48,11 @@ We’ll need to install some additional dependencies for our project. Open your 
 
 #### Step 4: Project Structure
 Your project directory should now have the following structure:
+
 ![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/ee3302af-2560-40ea-aade-7a8e94096a34)
 
-create <code>.env</code> file, add both S<code>EPOLIA_RPC_URL</code> and <code>PRIVATE_KEY</code> by your proper credentials as follows:
+create <code>.env</code> file, add both <code>SEPOLIA_RPC_URL</code> and <code>PRIVATE_KEY</code> by your proper credentials as follows:
+
+<code>SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/....</code>
+
+<code>PRIVATE_KEY=....</code>
