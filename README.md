@@ -3,6 +3,10 @@ Flash loans are a powerful tool in decentralized finance (DeFi) that allow users
 
 With this code we want to achieve transcation Atomicity with Zero colateral loans using DeFi Liquidity Providers for Crypto Token Arbitrage across two different exchanges.
 
+### Architecture Overview
+![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/5a34357c-cc15-473a-8bfa-5fb9d2221a68)
+
+
 ### Requirements Definition
 
 #### The OS tested
