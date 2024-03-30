@@ -53,6 +53,6 @@ Your project directory should now have the following structure:
 
 create <code>.env</code> file, add both <code>SEPOLIA_RPC_URL</code> and <code>PRIVATE_KEY</code> by your proper credentials as follows:
 
-<code>SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/....</code>
+<code>SEPOLIA_RPC_URL=<KEY></code>
 
-<code>PRIVATE_KEY=....</code>
+<code>PRIVATE_KEY=<KEY></code>
