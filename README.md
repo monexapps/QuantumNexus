@@ -1,7 +1,9 @@
 ### QuantumNexus
 Flash loans are a powerful tool in decentralized finance (DeFi) that allow users to borrow assets without collateral as long as the borrowed amount is repaid within the same transaction block. Flash loans are often used for arbitrage opportunities, collateral swapping, and other sophisticated DeFi strategies.
 
-With this code we want to achieve transcation Atomicity with Zero colateral loans using DeFi Liquidity Providers for Crypto Token Arbitrage across two different exchanges.
+With this code we want to achieve transaction Atomicity with Zero colateral loans using DeFi Liquidity Providers for Crypto Token Arbitrage across two different exchanges.
+
+Let me put it in simple words, we will get a loan from a DeFi Liquidity provider using a smart-contract of 1,000 USDT with 0 collateral required becuase we are using smart-contracts, then use it on an Exchange A to buy the Token A at 0.9 USDT and then use Exchange B to sell Token A at 1.0 USDT, then we repay the load of 1000 USDT and we keep profit of 10% or 100 USDT on our wallet. 
 
 ### Architecture Overview
 ![image](https://github.com/tHeStRyNg/QuantumNexus/assets/118682909/5a34357c-cc15-473a-8bfa-5fb9d2221a68)
