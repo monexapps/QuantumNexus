@@ -539,10 +539,15 @@ Let’s view our transaction on ehterscan
 Here’s the transactions explanation:
 
 1 - Transfer 1000 USDC from the aave LendingPool contract toFlashLoanArbitrage contract,
+
 2 - Deposit 1000 USDC from the FlashLoanArbitrage contract to Dex contract,
+
 3 - Purchase of DAI From Dex contract to FlashLoanArbitrage contract,
+
 4 - Deposit of the DAI amount in the Dex contract,
-5 - Transfer 1,111.1111 USDC from Dex contract to FlashLoanArbitrage
+
+5 - Transfer 1,111.1111 USDC from Dex contract to FlashLoanArbitrage,
+
 6 - Repay 1000 USDC + 0.05% of flashloan fee (1000.5 USDC)
 
 After a successfull tranaction, we’ll chek back our balalnce wich increases up to 110.611100 USDC
